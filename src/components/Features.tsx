@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import FadeIn from "./FadeIn";
 
 const features = [
@@ -21,7 +20,6 @@ const features = [
     ),
     title: "Live Map",
     description: "Upptäck heta områden och trending venues.",
-    preview: "/app/map-light.png",
     href: "#map",
   },
   {
@@ -58,30 +56,21 @@ export default function Features() {
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, i) => {
-            const Card = (
-              <div className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border/80 bg-[#FAFAFC] shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover">
-                <div className="p-7 pb-5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-light text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
-                    {feature.icon}
-                  </div>
-                  <h3 className="mt-5 text-base font-bold text-dark">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {feature.description}
-                  </p>
+            const card = (
+              <div className="group h-full rounded-3xl border border-border/80 bg-[#FAFAFC] p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-primary-light/30 hover:shadow-card-hover">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-light text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                  {feature.icon}
                 </div>
-                {feature.preview && (
-                  <div className="relative mt-auto h-28 overflow-hidden border-t border-border/50">
-                    <Image
-                      src={feature.preview}
-                      alt=""
-                      fill
-                      sizes="300px"
-                      className="object-cover object-top opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFC] via-transparent to-transparent" />
-                  </div>
+                <h3 className="mt-5 text-base font-bold text-dark">
+                  {feature.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {feature.description}
+                </p>
+                {feature.href && (
+                  <p className="mt-4 text-xs font-semibold text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    Explore map →
+                  </p>
                 )}
               </div>
             );
@@ -90,10 +79,10 @@ export default function Features() {
               <FadeIn key={feature.title} delay={i * 0.08}>
                 {feature.href ? (
                   <a href={feature.href} className="block h-full">
-                    {Card}
+                    {card}
                   </a>
                 ) : (
-                  Card
+                  card
                 )}
               </FadeIn>
             );
