@@ -22,7 +22,6 @@ export default function PhoneFrame({ children, className = "", floatDelay = 0 }:
       }}
     >
       <div className="relative mx-auto w-[220px] rounded-[2.5rem] border-[6px] border-dark/90 bg-dark/90 p-1.5 shadow-card sm:w-[250px]">
-        <div className="absolute top-3 left-1/2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-dark/90" />
         <div className="overflow-hidden rounded-[2rem] bg-[#FAFAFC]">{children}</div>
       </div>
     </motion.div>

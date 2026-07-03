@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "./Logo";
 
 const navLinks = [
-  { label: "Product", href: "#funktioner" },
-  { label: "Cities", href: "#städer" },
-  { label: "For Venues", href: "#venues" },
+  { label: "Product", href: "#features" },
+  { label: "Cities", href: "#cities" },
+  { label: "For venues", href: "#venues" },
 ];
 
 export default function Navbar() {
@@ -17,7 +17,7 @@ export default function Navbar() {
     <header className="fixed top-0 right-0 left-0 z-50">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/60 bg-white/75 px-4 py-3 shadow-soft backdrop-blur-xl sm:px-6">
-          <a href="#hem">
+          <a href="#home">
             <Logo />
           </a>
 
@@ -38,7 +38,7 @@ export default function Navbar() {
               href="#beta"
               className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-card sm:inline-block"
             >
-              Join Beta
+              Join beta
             </a>
 
             <button
@@ -81,7 +81,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="mt-2 block rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-white"
               >
-                Join Beta
+                Join beta
               </a>
             </motion.div>
           )}

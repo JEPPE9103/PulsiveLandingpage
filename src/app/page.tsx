@@ -1,12 +1,11 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
-import Features from "@/components/Features";
 import MapSpotlight from "@/components/MapSpotlight";
-import AppShowcase from "@/components/AppShowcase";
 import HowItWorks from "@/components/HowItWorks";
+import Features from "@/components/Features";
 import Vision from "@/components/Vision";
-import FinalCTA from "@/components/FinalCTA";
+import BetaSignup from "@/components/BetaSignup";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -15,12 +14,11 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Problem />
-      <Features />
       <MapSpotlight />
-      <AppShowcase />
       <HowItWorks />
+      <Features />
       <Vision />
-      <FinalCTA />
+      <BetaSignup />
       <Footer />
     </main>
   );

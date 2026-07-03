@@ -9,8 +9,8 @@ const problems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: "Guessing",
-    description: "Gruppchattar och Instagram stories — ingen vet var det faktiskt händer.",
+    title: "Pure guesswork",
+    description: "Group chats and social feeds — nobody knows where the city is actually alive right now.",
   },
   {
     icon: (
@@ -18,8 +18,8 @@ const problems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4m16 0a8 8 0 11-16 0 8 8 0 0116 0z" />
       </svg>
     ),
-    title: "Dead venues",
-    description: "Du kommer fram och inser att det är dött. Kvällen är redan förstörd.",
+    title: "Dead zones",
+    description: "You show up and realize it's quiet. The night — or the plan — is already ruined.",
   },
   {
     icon: (
@@ -27,8 +27,8 @@ const problems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: "Missing info",
-    description: "Ingen berättar hur läget faktiskt är just nu. Du missar kvällens bästa ställe.",
+    title: "No live intel",
+    description: "Nothing tells you how things actually are right now. You miss the city's best moments.",
   },
 ];
 
@@ -38,14 +38,14 @@ export default function Problem() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-dark sm:text-4xl">
-            Nightlife idag är trasigt.
+            Real-time city discovery is broken.
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted">
-            Folk använder gruppchattar, Instagram stories och ren chansning för
-            att välja vart de ska gå.
+            People rely on group chats, stories, and guesswork to decide
+            where to go.
           </p>
           <p className="mt-3 text-lg font-medium text-dark">
-            Ofta kommer man fram och inser: det är dött.
+            Too often, you arrive and realize: it&apos;s dead.
           </p>
         </FadeIn>
 

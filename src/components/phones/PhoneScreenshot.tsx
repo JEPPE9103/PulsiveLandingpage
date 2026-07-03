@@ -8,7 +8,7 @@ interface PhoneScreenshotProps {
 
 export function PhoneScreenshot({ src, alt, priority = false }: PhoneScreenshotProps) {
   return (
-    <div className="relative h-[500px] w-full overflow-hidden bg-[#FAFAFC]">
+    <div className="relative aspect-[472/1024] w-full overflow-hidden bg-[#FAFAFC]">
       <Image
         src={src}
         alt={alt}
