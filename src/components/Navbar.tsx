@@ -38,7 +38,7 @@ export default function Navbar() {
               href="#beta"
               className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary-dark hover:shadow-card sm:inline-block"
             >
-              Join beta
+              Get early access
             </a>
 
             <button
@@ -81,7 +81,7 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className="mt-2 block rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-white"
               >
-                Join beta
+                Get early access
               </a>
             </motion.div>
           )}

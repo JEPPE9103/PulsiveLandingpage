@@ -8,14 +8,15 @@ interface PhoneScreenshotProps {
 
 export function PhoneScreenshot({ src, alt, priority = false }: PhoneScreenshotProps) {
   return (
-    <div className="relative aspect-[472/1024] w-full overflow-hidden bg-[#FAFAFC]">
+    <div className="relative w-full overflow-hidden bg-[#FAFAFC]">
       <Image
         src={src}
         alt={alt}
-        fill
+        width={472}
+        height={1024}
         priority={priority}
         sizes="(max-width: 640px) 220px, 250px"
-        className="object-cover object-top"
+        className="block h-auto w-full"
       />
     </div>
   );

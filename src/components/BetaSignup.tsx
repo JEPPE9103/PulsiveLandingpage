@@ -44,13 +44,9 @@ export default function BetaSignup() {
     <section id="beta" className="py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeIn>
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary via-primary to-primary-dark px-6 py-14 text-center sm:px-12 sm:py-16">
-            <div className="pointer-events-none absolute right-0 bottom-0 h-full w-1/2 opacity-10">
-              <svg viewBox="0 0 300 400" className="h-full w-full" fill="white">
-                <path d="M150 50 L180 200 L220 380 L150 350 L80 380 L120 200 Z" />
-                <rect x="130" y="30" width="40" height="30" rx="4" />
-              </svg>
-            </div>
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#5a3ad9] via-primary to-[#8B6FFF] px-6 py-14 text-center shadow-[0_24px_64px_rgba(109,74,255,0.25)] sm:px-12 sm:py-16">
+            <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-accent-green/10 blur-3xl" />
 
             {status === "success" ? (
               <div className="relative mx-auto max-w-md">
@@ -60,17 +56,27 @@ export default function BetaSignup() {
                   </svg>
                 </div>
                 <h2 className="mt-5 text-2xl font-bold text-white sm:text-3xl">
-                  You&apos;re on the waitlist.
+                  You&apos;re in.
                 </h2>
-                <p className="mt-2 text-lg text-white/80">We&apos;ll be in touch soon.</p>
+                <p className="mt-2 text-lg text-white/80">
+                  We&apos;ll reach out when your spot opens up.
+                </p>
               </div>
             ) : (
               <>
-                <h2 className="relative text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Join Stockholm beta
+                <div className="relative mx-auto inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent-green animate-pulse" />
+                  <span className="text-xs font-semibold tracking-wide text-white/90 uppercase">
+                    Limited spots remaining
+                  </span>
+                </div>
+
+                <h2 className="relative mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                  Be first in Stockholm.
                 </h2>
-                <p className="relative mt-3 text-sm text-white/80">
-                  Invite-only · Stockholm inner city · Limited spots
+                <p className="relative mx-auto mt-3 max-w-md text-base text-white/80 sm:text-lg">
+                  Invite-only beta. Inner city. Early access to the city&apos;s
+                  pulse before anyone else.
                 </p>
 
                 <form
@@ -98,10 +104,13 @@ export default function BetaSignup() {
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="w-full rounded-full bg-white px-8 py-4 text-base font-semibold text-primary transition-all hover:shadow-lg hover:shadow-black/10 disabled:opacity-70"
+                    className="w-full rounded-full bg-white px-8 py-4 text-base font-semibold text-primary shadow-[0_4px_24px_rgba(0,0,0,0.15)] transition-all hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)] disabled:opacity-70"
                   >
-                    {status === "loading" ? "Submitting..." : "Join beta"}
+                    {status === "loading" ? "Submitting..." : "Get early access"}
                   </button>
+                  <p className="text-center text-xs text-white/50">
+                    No spam. Invite-only. Stockholm inner city.
+                  </p>
                 </form>
               </>
             )}

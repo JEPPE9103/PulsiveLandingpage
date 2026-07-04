@@ -7,7 +7,8 @@ import { MapScreen } from "./phones/MapScreen";
 export default function MapSpotlight() {
   return (
     <section id="map" className="relative overflow-hidden bg-white py-20 sm:py-28">
-      <div className="pointer-events-none absolute -left-32 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
+      <div className="pointer-events-none absolute -left-32 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/8 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 top-20 h-64 w-64 rounded-full bg-accent-green/5 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeIn className="mx-auto max-w-2xl text-center">
@@ -18,8 +19,8 @@ export default function MapSpotlight() {
             Stockholm&apos;s pulse on the map. Live.
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-muted">
-            See where the city is alive — area by area, venue by venue.
-            Real-time discovery in light and night mode.
+            Know where to go before the crowd catches on — area by area,
+            venue by venue, in real time.
           </p>
         </FadeIn>
 

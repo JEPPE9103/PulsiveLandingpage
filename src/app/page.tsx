@@ -2,6 +2,8 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import MapSpotlight from "@/components/MapSpotlight";
+import PulseFeed from "@/components/PulseFeed";
+import Moments from "@/components/Moments";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
 import Vision from "@/components/Vision";
@@ -15,8 +17,10 @@ export default function Home() {
       <Hero />
       <Problem />
       <MapSpotlight />
-      <HowItWorks />
+      <PulseFeed />
+      <Moments />
       <Features />
+      <HowItWorks />
       <Vision />
       <BetaSignup />
       <Footer />

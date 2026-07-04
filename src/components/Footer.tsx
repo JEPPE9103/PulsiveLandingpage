@@ -5,7 +5,9 @@ const footerLinks = {
   Product: [
     { label: "Features", href: "#features" },
     { label: "Live map", href: "#map" },
-    { label: "Beta", href: "#beta" },
+    { label: "Pulse Feed", href: "#pulse-feed" },
+    { label: "Moments", href: "#moments" },
+    { label: "Early access", href: "#beta" },
   ],
   "For venues": [
     { label: "Partner", href: "#venues" },
@@ -22,8 +24,8 @@ export default function Footer() {
             <Logo />
             <BrandTagline size="sm" className="mt-3" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-              PULSIVE shows where the city is alive right now. Discover hot
-              areas, venues, and social energy — live in Stockholm.
+              The real-time layer for city discovery. Live pulse, live map,
+              live conversations, and the moments that make the night.
             </p>
             <a
               href="mailto:hello@pulsive.app"
