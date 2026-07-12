@@ -10,14 +10,15 @@ const footerLinks = {
     { label: "Early access", href: "#beta" },
   ],
   "For venues": [
-    { label: "Partner", href: "#venues" },
+    { label: "Venue dashboard", href: "#venues" },
+    { label: "Pricing", href: "#venue-pricing" },
     { label: "Contact", href: "mailto:hello@pulsive.app" },
   ],
 };
 
 export default function Footer() {
   return (
-    <footer id="venues" className="border-t border-border bg-white pt-16 pb-8">
+    <footer className="border-t border-border bg-white pt-16 pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-4">
           <div className="lg:col-span-2">

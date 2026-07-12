@@ -7,6 +7,7 @@ import Moments from "@/components/Moments";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
 import Vision from "@/components/Vision";
+import ForVenues from "@/components/ForVenues";
 import BetaSignup from "@/components/BetaSignup";
 import Footer from "@/components/Footer";
 
@@ -22,6 +23,7 @@ export default function Home() {
       <Features />
       <HowItWorks />
       <Vision />
+      <ForVenues />
       <BetaSignup />
       <Footer />
     </main>
