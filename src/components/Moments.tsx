@@ -55,9 +55,9 @@ export default function Moments() {
               long after the lights go out — your vimmel, your story.
             </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="mt-8 grid grid-cols-2 items-stretch gap-3 sm:gap-4">
               {venues.map((venue, i) => (
-                <FadeIn key={venue.src} delay={i * 0.08}>
+                <FadeIn key={venue.src} delay={i * 0.08} className="h-full">
                   <VenueCard
                     src={venue.src}
                     alt={venue.alt}
