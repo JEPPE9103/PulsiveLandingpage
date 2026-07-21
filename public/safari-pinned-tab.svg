@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <!-- Monochrome P mark for Safari pinned tab / mask-icon -->
+  <path
+    fill="#000"
+    d="M3.2 2.2h5.1c2.85 0 4.9 1.85 4.9 4.45S11.15 11.1 8.3 11.1H5.9V13.8H3.2V2.2zm2.7 2.3v4.1h2.2c1.35 0 2.25-.85 2.25-2.05S9.45 4.5 8.1 4.5H5.9z"
+  />
+</svg>
