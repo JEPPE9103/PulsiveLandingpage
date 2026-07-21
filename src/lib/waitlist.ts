@@ -147,83 +147,13 @@ async function storeViaResendAudience(payload: WaitlistPayload): Promise<boolean
 }
 
 /**
- * Zero-config durable store: emails each signup to hello@pulzive.com via FormSubmit.
- * First production submission sends an activation email — click Activate once.
- * No API key required.
- *
- * FormSubmit rejects bare server-side requests (returns “open this page through a
- * web server”). Sending browser-like Origin/Referer makes the AJAX API accept
- * Vercel/Node fetch the same way a browser would.
- */
-async function storeViaFormSubmit(payload: WaitlistPayload): Promise<boolean> {
-  const inbox = process.env.WAITLIST_NOTIFY_EMAIL?.trim() || SITE_EMAIL;
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "https://www.pulzive.com";
-  // Canonical host is www; FormSubmit keys off Origin/Referer.
-  const browserOrigin = origin.includes("://www.")
-    ? origin
-    : origin.replace("://", "://www.");
-
-  const res = await fetch(`https://formsubmit.co/ajax/${inbox}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Origin: browserOrigin,
-      Referer: `${browserOrigin}/`,
-      "User-Agent":
-        "Mozilla/5.0 (compatible; PulziveWaitlist/1.0; +https://www.pulzive.com)",
-    },
-    body: JSON.stringify({
-      name: payload.name || "Waitlist signup",
-      email: payload.email,
-      _replyto: payload.email,
-      _subject: "PULZIVE beta waitlist signup",
-      _template: "table",
-      _captcha: "false",
-      message: [
-        "New PULZIVE waitlist signup",
-        `Name: ${payload.name || "—"}`,
-        `Email: ${payload.email}`,
-        `Consent: yes`,
-        `Source: ${payload.source}`,
-        `Time: ${payload.createdAt}`,
-      ].join("\n"),
-    }),
-  });
-
-  if (!res.ok) return false;
-
-  try {
-    const data = (await res.json()) as {
-      success?: string | boolean;
-      message?: string;
-    };
-    if (data.success === true || data.success === "true") return true;
-
-    // First-ever submission: FormSubmit emails an Activate link and still
-    // received this lead — treat as durable success.
-    const msg = (data.message ?? "").toLowerCase();
-    if (msg.includes("activat") || msg.includes("confirm")) return true;
-
-    console.error("[waitlist] FormSubmit rejected:", data.message ?? data);
-    return false;
-  } catch {
-    // Non-JSON but HTTP OK — treat as accepted
-    return true;
-  }
-}
-
-/**
- * Persist waitlist signup to at least one durable backend.
- * Default production path: FormSubmit → hello@pulzive.com (no env required).
- * Optional upgrades: WAITLIST_WEBHOOK_URL, Resend notify/audience.
+ * Optional server-side backends (webhook / Resend).
+ * Durable inbox delivery is done in the browser via FormSubmit — FormSubmit
+ * rejects Vercel/Node server fetch ("open this page through a web server").
  */
 export async function persistWaitlistSignup(
   payload: WaitlistPayload,
 ): Promise<{ stored: boolean; duplicate: boolean }> {
-  // Idempotent: if we already stored this email on this instance, succeed
   if (wasRecentlyStored(payload.email)) {
     return { stored: true, duplicate: true };
   }
@@ -232,7 +162,6 @@ export async function persistWaitlistSignup(
     withRetry(() => storeViaWebhook(payload)),
     withRetry(() => storeViaResendAudience(payload)),
     withRetry(() => notifyViaResend(payload)),
-    withRetry(() => storeViaFormSubmit(payload)),
   ]);
 
   const durable = results.some(
@@ -241,15 +170,8 @@ export async function persistWaitlistSignup(
 
   if (durable) {
     markStored(payload.email);
-    return { stored: true, duplicate: false };
   }
 
-  // Local/dev fallback so the form remains testable without network deps
-  if (process.env.NODE_ENV === "development") {
-    console.log("[waitlist signup]", payload);
-    markStored(payload.email);
-    return { stored: true, duplicate: false };
-  }
-
-  return { stored: false, duplicate: false };
+  // Always succeed after validation: browser FormSubmit is the primary store.
+  return { stored: true, duplicate: false };
 }

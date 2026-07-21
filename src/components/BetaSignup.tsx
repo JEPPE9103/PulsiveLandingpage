@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import FadeIn from "./FadeIn";
+import { deliverWaitlistViaFormSubmit } from "@/lib/waitlist-client";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -41,6 +42,27 @@ export default function BetaSignup() {
 
       if (!res.ok) {
         setErrorMsg(data.error ?? "Something went wrong. Please try again.");
+        setStatus("error");
+        return;
+      }
+
+      // Honeypot trap: pretend success, do not email
+      if (data.skipDeliver) {
+        setStatus("success");
+        setName("");
+        setEmail("");
+        setConsent(false);
+        setHoneypot("");
+        return;
+      }
+
+      // FormSubmit must run in the browser — it rejects Vercel server fetch.
+      const delivered = await deliverWaitlistViaFormSubmit({ name, email });
+      if (!delivered.ok) {
+        setErrorMsg(
+          delivered.error ??
+            "Could not save your signup right now. Please try again shortly.",
+        );
         setStatus("error");
         return;
       }

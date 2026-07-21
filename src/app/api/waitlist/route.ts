@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     // Honeypot — bots fill hidden fields; humans never see them
     if (isHoneypotFilled(body.company) || isHoneypotFilled(body.website)) {
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, skipDeliver: true });
     }
 
     if (body.consent !== true) {
