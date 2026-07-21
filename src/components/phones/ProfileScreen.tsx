@@ -4,7 +4,7 @@ export function ProfileScreen() {
   return (
     <PhoneScreenshot
       src="/app/profile.png"
-      alt="PULZIVE — your profile and nights"
+      alt="PULZIVE Moments — your nightlife history"
     />
   );
 }
