@@ -1,8 +1,11 @@
-# PULSIVE Landing Page
+# PULZIVE Landing Page
 
-Premium landing page for [PULSIVE](https://github.com/JEPPE9103/PulsiveLandingpage) — real-time city discovery in Stockholm.
+Premium landing page for [PULZIVE](https://pulzive.com) — real-time city discovery in Stockholm.
 
 **See the pulse. Feel the vibe.**
+
+**Production domain:** https://pulzive.com  
+**Contact:** hello@pulzive.com
 
 ## Stack
 
@@ -19,29 +22,39 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Beta signup works locally without extra config — submissions are logged to the server console in development.
+In development, waitlist signups are accepted and logged to the server console even without env vars.
 
-## Environment variables
+## Environment variables (production)
 
-For production beta signup, configure at least one storage method in Vercel (or `.env.local`):
+Configure at least **one durable storage method** in Vercel:
 
-| Variable | Description |
-|----------|-------------|
-| `WAITLIST_WEBHOOK_URL` | POST endpoint (Airtable automation, Make, Zapier, Google Apps Script, etc.) |
-| `RESEND_API_KEY` | Resend API key for email notifications |
-| `WAITLIST_NOTIFY_EMAIL` | Email address to receive signup alerts |
-| `RESEND_FROM` | Optional sender (default: `PULSIVE <onboarding@resend.dev>`) |
-| `NEXT_PUBLIC_SITE_URL` | Canonical site URL (default: `https://pulsive.app`) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SITE_URL` | Recommended | `https://pulzive.com` |
+| `WAITLIST_WEBHOOK_URL` | Strongly recommended | POST endpoint (Airtable / Make / Zapier / Sheets) — permanent lead store |
+| `RESEND_API_KEY` | Optional | Resend API key |
+| `RESEND_AUDIENCE_ID` | Optional | Resend audience for durable contact storage |
+| `WAITLIST_NOTIFY_EMAIL` | Optional | e.g. `hello@pulzive.com` — email alert per signup |
+| `RESEND_FROM` | Optional | Verified sender, e.g. `PULZIVE <hello@pulzive.com>` |
 
-Without these, the waitlist API returns an error in production.
+**Production rule:** without webhook and/or Resend audience/notify, waitlist returns 503.
+
+Recommended minimum for launch:
+
+```
+NEXT_PUBLIC_SITE_URL=https://pulzive.com
+WAITLIST_WEBHOOK_URL=https://hooks.zapier.com/...
+RESEND_API_KEY=re_...
+WAITLIST_NOTIFY_EMAIL=hello@pulzive.com
+RESEND_FROM=PULZIVE <hello@pulzive.com>
+```
 
 ## Deploy on Vercel
 
-1. Push this repo to GitHub
-2. Import the project at [vercel.com/new](https://vercel.com/new)
-3. Select **JEPPE9103/PulsiveLandingpage**
-4. Add environment variables for beta signup
-5. Vercel auto-detects Next.js — click **Deploy**
+1. Import the GitHub repo **JEPPE9103/PulsiveLandingpage**
+2. Set environment variables (Production)
+3. Add custom domain `pulzive.com`
+4. Deploy
 
 ## Scripts
 
@@ -50,3 +63,4 @@ Without these, the waitlist API returns an error in production.
 | `npm run dev` | Local development |
 | `npm run build` | Production build |
 | `npm run start` | Run production build |
+| `npm run lint` | Lint |

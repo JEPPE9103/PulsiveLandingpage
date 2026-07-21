@@ -1,5 +1,7 @@
+import Link from "next/link";
 import Logo from "./Logo";
 import BrandTagline from "./BrandTagline";
+import { SITE_EMAIL, SITE_NAME } from "@/lib/site";
 
 const footerLinks = {
   Product: [
@@ -12,7 +14,11 @@ const footerLinks = {
   "For venues": [
     { label: "Venue dashboard", href: "#venues" },
     { label: "Pricing", href: "#venue-pricing" },
-    { label: "Contact", href: "mailto:hello@pulsive.app" },
+    { label: "Contact", href: `mailto:${SITE_EMAIL}` },
+  ],
+  Legal: [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
   ],
 };
 
@@ -20,7 +26,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border bg-white pt-16 pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-4">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Logo />
             <BrandTagline size="sm" className="mt-3" />
@@ -29,10 +35,10 @@ export default function Footer() {
               live conversations, and the moments that make the night.
             </p>
             <a
-              href="mailto:hello@pulsive.app"
+              href={`mailto:${SITE_EMAIL}`}
               className="mt-5 inline-flex text-sm font-medium text-primary transition-colors hover:text-primary-dark"
             >
-              hello@pulsive.app
+              {SITE_EMAIL}
             </a>
           </div>
 
@@ -42,12 +48,21 @@ export default function Footer() {
               <ul className="mt-4 space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-muted transition-colors hover:text-primary"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith("/") ? (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-muted transition-colors hover:text-primary"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-sm text-muted transition-colors hover:text-primary"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -57,7 +72,7 @@ export default function Footer() {
 
         <div className="mt-12 border-t border-border pt-8 text-center">
           <p className="text-sm text-muted">
-            © {new Date().getFullYear()} PULSIVE. All rights reserved.
+            © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
           </p>
         </div>
       </div>

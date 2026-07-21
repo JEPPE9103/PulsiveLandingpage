@@ -2,6 +2,7 @@
 
 import FadeIn from "./FadeIn";
 import VenuesDashboard from "./venues/VenuesDashboard";
+import { SITE_EMAIL } from "@/lib/site";
 
 const features = [
   {
@@ -98,14 +99,14 @@ export default function ForVenues() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href="mailto:hello@pulsive.app?subject=Request%20Demo%20-%20PULSIVE%20Venues"
+                href={`mailto:${SITE_EMAIL}?subject=Request%20Demo%20-%20PULZIVE%20Venues`}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-white shadow-[0_4px_24px_rgba(109,74,255,0.35)] transition-all hover:bg-primary-dark hover:shadow-[0_8px_32px_rgba(109,74,255,0.45)]"
               >
                 Request Demo
                 <span aria-hidden>→</span>
               </a>
               <a
-                href="mailto:hello@pulsive.app?subject=Become%20a%20Venue%20Partner"
+                href={`mailto:${SITE_EMAIL}?subject=Become%20a%20Venue%20Partner`}
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-7 py-3.5 text-sm font-semibold text-dark transition-all hover:border-primary/25 hover:shadow-soft"
               >
                 Become a Venue Partner
@@ -182,7 +183,7 @@ export default function ForVenues() {
                     ))}
                   </ul>
                   <a
-                    href={`mailto:hello@pulsive.app?subject=PULSIVE%20${plan.name}%20Plan`}
+                    href={`mailto:${SITE_EMAIL}?subject=PULZIVE%20${plan.name}%20Plan`}
                     className={`mt-6 block rounded-full py-2.5 text-center text-sm font-semibold transition-all ${
                       plan.popular
                         ? "bg-primary text-white hover:bg-primary-dark hover:shadow-card"

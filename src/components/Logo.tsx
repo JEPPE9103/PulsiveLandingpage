@@ -1,25 +1,33 @@
+import Image from "next/image";
+import { SITE_NAME } from "@/lib/site";
+
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   showText?: boolean;
 }
 
+const sizes = {
+  sm: { box: "h-8 w-8", text: "text-base", px: 32 },
+  md: { box: "h-9 w-9", text: "text-lg", px: 36 },
+  lg: { box: "h-11 w-11", text: "text-xl", px: 44 },
+};
+
 export default function Logo({ size = "md", showText = true }: LogoProps) {
-  const iconSize =
-    size === "sm" ? "h-8 w-8" : size === "lg" ? "h-11 w-11" : "h-9 w-9";
-  const textSize =
-    size === "sm" ? "text-base" : size === "lg" ? "text-xl" : "text-lg";
-  const letterSize = size === "lg" ? "text-base" : "text-sm";
+  const s = sizes[size];
 
   return (
     <div className="flex items-center gap-2.5">
-      <div
-        className={`${iconSize} flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark shadow-card`}
-      >
-        <span className={`${letterSize} font-bold text-white`}>P</span>
-      </div>
+      <Image
+        src="/logo.png"
+        alt={SITE_NAME}
+        width={s.px}
+        height={s.px}
+        className={`${s.box} rounded-xl shadow-card`}
+        priority
+      />
       {showText && (
-        <span className={`${textSize} font-bold tracking-tight text-dark`}>
-          PULSIVE
+        <span className={`${s.text} font-bold tracking-tight text-dark`}>
+          {SITE_NAME}
         </span>
       )}
     </div>

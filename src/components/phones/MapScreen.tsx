@@ -9,8 +9,8 @@ export function MapScreen({ variant = "light", priority = false }: MapScreenProp
   const src = variant === "dark" ? "/app/map-dark.png" : "/app/map-light.png";
   const alt =
     variant === "dark"
-      ? "PULSIVE live map — night mode, Stockholm"
-      : "PULSIVE live map — light mode, Stockholm";
+      ? "PULZIVE live map — night mode, Stockholm"
+      : "PULZIVE live map — light mode, Stockholm";
 
   return <PhoneScreenshot src={src} alt={alt} priority={priority} />;
 }

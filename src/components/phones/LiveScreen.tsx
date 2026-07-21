@@ -8,7 +8,7 @@ export function LiveScreen({ priority = false }: LiveScreenProps) {
   return (
     <PhoneScreenshot
       src="/app/live.png"
-      alt="PULSIVE Live — city pulse in real time"
+      alt="PULZIVE Live — city pulse in real time"
       priority={priority}
     />
   );

@@ -81,7 +81,7 @@ export default function VenuesDashboard() {
           </div>
           <div className="mx-auto flex items-center gap-2 rounded-lg bg-[#FAFAFC] px-3 py-1">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-green animate-pulse" />
-            <span className="text-[10px] font-medium text-muted">venues.pulsive.app · F12 Stockholm</span>
+            <span className="text-[10px] font-medium text-muted">venues.pulzive.com · F12 Stockholm</span>
           </div>
         </div>
 

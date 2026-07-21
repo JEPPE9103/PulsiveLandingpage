@@ -4,7 +4,7 @@ export function DiscussionsScreen() {
   return (
     <PhoneScreenshot
       src="/app/discussions.png"
-      alt="PULSIVE — city buzz live"
+      alt="PULZIVE — city buzz live"
     />
   );
 }

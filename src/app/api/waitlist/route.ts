@@ -1,17 +1,50 @@
 import { NextResponse } from "next/server";
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import {
+  checkRateLimit,
+  isHoneypotFilled,
+  isValidEmail,
+  normalizeEmail,
+  persistWaitlistSignup,
+} from "@/lib/waitlist";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const name = typeof body.name === "string" ? body.name.trim() : "";
+
+    // Honeypot — bots fill hidden fields; humans never see them
+    if (isHoneypotFilled(body.company) || isHoneypotFilled(body.website)) {
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.consent !== true) {
+      return NextResponse.json(
+        { error: "Please accept the privacy policy to join the waitlist." },
+        { status: 400 },
+      );
+    }
+
+    const email =
+      typeof body.email === "string" ? normalizeEmail(body.email) : "";
+    const name = typeof body.name === "string" ? body.name.trim().slice(0, 100) : "";
 
     if (!email || !isValidEmail(email)) {
-      return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid email address." },
+        { status: 400 },
+      );
+    }
+
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip =
+      forwarded?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many attempts. Please try again in a few minutes." },
+        { status: 429 },
+      );
     }
 
     const payload = {
@@ -19,53 +52,27 @@ export async function POST(request: Request) {
       name: name || null,
       source: "landing-page",
       createdAt: new Date().toISOString(),
+      consent: true as const,
     };
 
-    let stored = false;
-
-    const webhook = process.env.WAITLIST_WEBHOOK_URL;
-    if (webhook) {
-      const res = await fetch(webhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      stored = res.ok;
-    }
-
-    const resendKey = process.env.RESEND_API_KEY;
-    const notifyEmail = process.env.WAITLIST_NOTIFY_EMAIL;
-    if (resendKey && notifyEmail) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: process.env.RESEND_FROM ?? "PULSIVE <onboarding@resend.dev>",
-          to: notifyEmail,
-          subject: "New beta signup — PULSIVE",
-          text: `Name: ${name || "—"}\nEmail: ${email}\nTime: ${payload.createdAt}`,
-        }),
-      });
-      stored = stored || res.ok;
-    }
-
-    if (!stored && process.env.NODE_ENV === "development") {
-      console.log("[waitlist signup]", payload);
-      stored = true;
-    }
+    const { stored, duplicate } = await persistWaitlistSignup(payload);
 
     if (!stored) {
       return NextResponse.json(
-        { error: "Could not save your signup right now. Please try again shortly." },
+        {
+          error:
+            "Could not save your signup right now. Please try again shortly.",
+        },
         { status: 503 },
       );
     }
 
-    return NextResponse.json({ success: true });
+    // Idempotent success for duplicates — don't leak whether email exists
+    return NextResponse.json({ success: true, duplicate: Boolean(duplicate) });
   } catch {
-    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong. Please try again." },
+      { status: 500 },
+    );
   }
 }

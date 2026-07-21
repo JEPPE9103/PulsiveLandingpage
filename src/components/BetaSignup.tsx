@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import FadeIn from "./FadeIn";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -8,6 +9,8 @@ type Status = "idle" | "loading" | "success" | "error";
 export default function BetaSignup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -16,11 +19,22 @@ export default function BetaSignup() {
     setStatus("loading");
     setErrorMsg("");
 
+    if (!consent) {
+      setErrorMsg("Please accept the privacy policy to join the waitlist.");
+      setStatus("error");
+      return;
+    }
+
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({
+          name,
+          email,
+          consent: true,
+          company: honeypot,
+        }),
       });
 
       const data = await res.json();
@@ -34,6 +48,8 @@ export default function BetaSignup() {
       setStatus("success");
       setName("");
       setEmail("");
+      setConsent(false);
+      setHoneypot("");
     } catch {
       setErrorMsg("Something went wrong. Please try again.");
       setStatus("error");
@@ -49,7 +65,7 @@ export default function BetaSignup() {
             <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-accent-green/10 blur-3xl" />
 
             {status === "success" ? (
-              <div className="relative mx-auto max-w-md">
+              <div className="relative mx-auto max-w-md" role="status" aria-live="polite">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/20">
                   <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -82,25 +98,78 @@ export default function BetaSignup() {
                 <form
                   onSubmit={handleSubmit}
                   className="relative mx-auto mt-8 max-w-md space-y-3 text-left"
+                  noValidate
                 >
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Name (optional)"
-                    className="w-full rounded-2xl border border-white/20 bg-white/95 px-4 py-3.5 text-sm text-dark placeholder:text-muted focus:border-white focus:ring-2 focus:ring-white/30 focus:outline-none"
-                  />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email address *"
-                    className="w-full rounded-2xl border border-white/20 bg-white/95 px-4 py-3.5 text-sm text-dark placeholder:text-muted focus:border-white focus:ring-2 focus:ring-white/30 focus:outline-none"
-                  />
+                  {/* Honeypot — hidden from users */}
+                  <div className="absolute -left-[9999px] opacity-0" aria-hidden="true">
+                    <label htmlFor="company">Company</label>
+                    <input
+                      id="company"
+                      name="company"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="beta-name" className="mb-1.5 block text-xs font-medium text-white/80">
+                      Name <span className="text-white/50">(optional)</span>
+                    </label>
+                    <input
+                      id="beta-name"
+                      type="text"
+                      name="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      autoComplete="name"
+                      className="w-full rounded-2xl border border-white/20 bg-white/95 px-4 py-3.5 text-sm text-dark placeholder:text-muted focus:border-white focus:ring-2 focus:ring-white/30 focus:outline-none"
+                      placeholder="Your name"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="beta-email" className="mb-1.5 block text-xs font-medium text-white/80">
+                      Email address
+                    </label>
+                    <input
+                      id="beta-email"
+                      type="email"
+                      name="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      className="w-full rounded-2xl border border-white/20 bg-white/95 px-4 py-3.5 text-sm text-dark placeholder:text-muted focus:border-white focus:ring-2 focus:ring-white/30 focus:outline-none"
+                      placeholder="you@email.com"
+                    />
+                  </div>
+
+                  <label className="flex items-start gap-2.5 pt-1 text-left text-xs leading-relaxed text-white/75">
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/30 accent-white"
+                      required
+                    />
+                    <span>
+                      I agree to the{" "}
+                      <Link href="/privacy" className="underline underline-offset-2 hover:text-white">
+                        Privacy Policy
+                      </Link>{" "}
+                      and consent to being contacted about the PULZIVE beta.
+                    </span>
+                  </label>
+
                   {status === "error" && errorMsg && (
-                    <p className="text-center text-sm text-red-200">{errorMsg}</p>
+                    <p className="text-center text-sm text-red-200" role="alert" aria-live="assertive">
+                      {errorMsg}
+                    </p>
                   )}
+
                   <button
                     type="submit"
                     disabled={status === "loading"}
