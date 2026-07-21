@@ -25,7 +25,8 @@ export async function POST(request: Request) {
 
     const email =
       typeof body.email === "string" ? normalizeEmail(body.email) : "";
-    const name = typeof body.name === "string" ? body.name.trim().slice(0, 100) : "";
+    const name =
+      typeof body.name === "string" ? body.name.trim().slice(0, 100) : "";
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json(
@@ -67,7 +68,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Idempotent success for duplicates — don't leak whether email exists
     return NextResponse.json({ success: true, duplicate: Boolean(duplicate) });
   } catch {
     return NextResponse.json(

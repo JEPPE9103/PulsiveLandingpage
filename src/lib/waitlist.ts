@@ -1,3 +1,5 @@
+import { SITE_EMAIL } from "@/lib/site";
+
 export type WaitlistPayload = {
   email: string;
   name: string | null;
@@ -28,14 +30,17 @@ export function isHoneypotFilled(value: unknown) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function checkDuplicateEmail(email: string): boolean {
+/** Returns true if this email was already stored successfully recently */
+export function wasRecentlyStored(email: string): boolean {
   const now = Date.now();
   for (const [key, ts] of recentEmails) {
     if (now - ts > DUPLICATE_WINDOW_MS) recentEmails.delete(key);
   }
-  if (recentEmails.has(email)) return true;
-  recentEmails.set(email, now);
-  return false;
+  return recentEmails.has(email);
+}
+
+export function markStored(email: string) {
+  recentEmails.set(email, Date.now());
 }
 
 export function checkRateLimit(ip: string): boolean {
@@ -52,6 +57,25 @@ export function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+async function withRetry(
+  fn: () => Promise<boolean>,
+  attempts = 2,
+): Promise<boolean> {
+  let last = false;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      last = await fn();
+      if (last) return true;
+    } catch {
+      last = false;
+    }
+    if (i < attempts - 1) {
+      await new Promise((r) => setTimeout(r, 300));
+    }
+  }
+  return last;
+}
+
 async function storeViaWebhook(payload: WaitlistPayload): Promise<boolean> {
   const webhook = process.env.WAITLIST_WEBHOOK_URL;
   if (!webhook) return false;
@@ -65,14 +89,14 @@ async function storeViaWebhook(payload: WaitlistPayload): Promise<boolean> {
     body: JSON.stringify(payload),
   });
 
-  // Treat 2xx and 409 (already exists) as durable success
   return res.ok || res.status === 409;
 }
 
 async function notifyViaResend(payload: WaitlistPayload): Promise<boolean> {
   const resendKey = process.env.RESEND_API_KEY;
-  const notifyEmail = process.env.WAITLIST_NOTIFY_EMAIL;
-  if (!resendKey || !notifyEmail) return false;
+  const notifyEmail =
+    process.env.WAITLIST_NOTIFY_EMAIL?.trim() || SITE_EMAIL;
+  if (!resendKey) return false;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -81,9 +105,10 @@ async function notifyViaResend(payload: WaitlistPayload): Promise<boolean> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-          from: process.env.RESEND_FROM ?? "PULZIVE <onboarding@resend.dev>",
-          to: notifyEmail,
-          subject: "New beta signup — PULZIVE",
+      from: process.env.RESEND_FROM ?? "PULZIVE <onboarding@resend.dev>",
+      to: notifyEmail,
+      reply_to: payload.email,
+      subject: "New beta signup — PULZIVE",
       text: [
         `Name: ${payload.name || "—"}`,
         `Email: ${payload.email}`,
@@ -118,23 +143,81 @@ async function storeViaResendAudience(payload: WaitlistPayload): Promise<boolean
     },
   );
 
-  // 409 = contact already exists → still durable
   return res.ok || res.status === 409;
 }
 
 /**
+ * Zero-config durable store: emails each signup to hello@pulzive.com via FormSubmit.
+ * First production submission sends an activation email — click Activate once.
+ * No API key required.
+ */
+async function storeViaFormSubmit(payload: WaitlistPayload): Promise<boolean> {
+  const inbox = process.env.WAITLIST_NOTIFY_EMAIL?.trim() || SITE_EMAIL;
+
+  const res = await fetch(`https://formsubmit.co/ajax/${inbox}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      name: payload.name || "Waitlist signup",
+      email: payload.email,
+      _replyto: payload.email,
+      _subject: "PULZIVE beta waitlist signup",
+      _template: "table",
+      _captcha: "false",
+      message: [
+        "New PULZIVE waitlist signup",
+        `Name: ${payload.name || "—"}`,
+        `Email: ${payload.email}`,
+        `Consent: yes`,
+        `Source: ${payload.source}`,
+        `Time: ${payload.createdAt}`,
+      ].join("\n"),
+    }),
+  });
+
+  if (!res.ok) return false;
+
+  // FormSubmit returns JSON { success: "true" } or similar
+  try {
+    const data = (await res.json()) as {
+      success?: string | boolean;
+      message?: string;
+    };
+    if (data.success === false || data.success === "false") {
+      // First-ever submission only needs inbox activation; FormSubmit still
+      // received the lead and emails an Activate link to the inbox.
+      const msg = (data.message ?? "").toLowerCase();
+      if (msg.includes("activat") || msg.includes("confirm")) return true;
+      return false;
+    }
+  } catch {
+    // Non-JSON but HTTP OK — treat as accepted
+  }
+
+  return true;
+}
+
+/**
  * Persist waitlist signup to at least one durable backend.
- * Production requires WAITLIST_WEBHOOK_URL and/or Resend audience/notify.
+ * Default production path: FormSubmit → hello@pulzive.com (no env required).
+ * Optional upgrades: WAITLIST_WEBHOOK_URL, Resend notify/audience.
  */
 export async function persistWaitlistSignup(
   payload: WaitlistPayload,
 ): Promise<{ stored: boolean; duplicate: boolean }> {
-  const alreadySeen = checkDuplicateEmail(payload.email);
+  // Idempotent: if we already stored this email on this instance, succeed
+  if (wasRecentlyStored(payload.email)) {
+    return { stored: true, duplicate: true };
+  }
 
   const results = await Promise.allSettled([
-    storeViaWebhook(payload),
-    storeViaResendAudience(payload),
-    notifyViaResend(payload),
+    withRetry(() => storeViaWebhook(payload)),
+    withRetry(() => storeViaResendAudience(payload)),
+    withRetry(() => notifyViaResend(payload)),
+    withRetry(() => storeViaFormSubmit(payload)),
   ]);
 
   const durable = results.some(
@@ -142,14 +225,16 @@ export async function persistWaitlistSignup(
   );
 
   if (durable) {
-    return { stored: true, duplicate: alreadySeen };
+    markStored(payload.email);
+    return { stored: true, duplicate: false };
   }
 
-  // Local/dev fallback so the form remains testable without secrets
+  // Local/dev fallback so the form remains testable without network deps
   if (process.env.NODE_ENV === "development") {
     console.log("[waitlist signup]", payload);
-    return { stored: true, duplicate: alreadySeen };
+    markStored(payload.email);
+    return { stored: true, duplicate: false };
   }
 
-  return { stored: false, duplicate: alreadySeen };
+  return { stored: false, duplicate: false };
 }
