@@ -150,15 +150,30 @@ async function storeViaResendAudience(payload: WaitlistPayload): Promise<boolean
  * Zero-config durable store: emails each signup to hello@pulzive.com via FormSubmit.
  * First production submission sends an activation email — click Activate once.
  * No API key required.
+ *
+ * FormSubmit rejects bare server-side requests (returns “open this page through a
+ * web server”). Sending browser-like Origin/Referer makes the AJAX API accept
+ * Vercel/Node fetch the same way a browser would.
  */
 async function storeViaFormSubmit(payload: WaitlistPayload): Promise<boolean> {
   const inbox = process.env.WAITLIST_NOTIFY_EMAIL?.trim() || SITE_EMAIL;
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    "https://www.pulzive.com";
+  // Canonical host is www; FormSubmit keys off Origin/Referer.
+  const browserOrigin = origin.includes("://www.")
+    ? origin
+    : origin.replace("://", "://www.");
 
   const res = await fetch(`https://formsubmit.co/ajax/${inbox}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      Origin: browserOrigin,
+      Referer: `${browserOrigin}/`,
+      "User-Agent":
+        "Mozilla/5.0 (compatible; PulziveWaitlist/1.0; +https://www.pulzive.com)",
     },
     body: JSON.stringify({
       name: payload.name || "Waitlist signup",
@@ -180,24 +195,24 @@ async function storeViaFormSubmit(payload: WaitlistPayload): Promise<boolean> {
 
   if (!res.ok) return false;
 
-  // FormSubmit returns JSON { success: "true" } or similar
   try {
     const data = (await res.json()) as {
       success?: string | boolean;
       message?: string;
     };
-    if (data.success === false || data.success === "false") {
-      // First-ever submission only needs inbox activation; FormSubmit still
-      // received the lead and emails an Activate link to the inbox.
-      const msg = (data.message ?? "").toLowerCase();
-      if (msg.includes("activat") || msg.includes("confirm")) return true;
-      return false;
-    }
+    if (data.success === true || data.success === "true") return true;
+
+    // First-ever submission: FormSubmit emails an Activate link and still
+    // received this lead — treat as durable success.
+    const msg = (data.message ?? "").toLowerCase();
+    if (msg.includes("activat") || msg.includes("confirm")) return true;
+
+    console.error("[waitlist] FormSubmit rejected:", data.message ?? data);
+    return false;
   } catch {
     // Non-JSON but HTTP OK — treat as accepted
+    return true;
   }
-
-  return true;
 }
 
 /**
