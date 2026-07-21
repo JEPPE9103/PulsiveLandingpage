@@ -22,7 +22,7 @@ export default function Logo({ size = "md", showText = true }: LogoProps) {
         alt={SITE_NAME}
         width={s.px}
         height={s.px}
-        className={`${s.box} rounded-xl shadow-card`}
+        className={`${s.box} rounded-xl object-cover shadow-card ring-1 ring-black/10`}
         priority
       />
       {showText && (
